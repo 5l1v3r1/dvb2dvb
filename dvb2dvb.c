@@ -182,7 +182,7 @@ int init_service(struct service_t* sv)
 
   // Now process the other tables, in any order
   //  PMT: sv->pmt_pid
-  //  SDT: 
+  //  SDT:
   while((!sv->pmt.length) || (!sv->sdt.length)) {
     n = rb_read(&sv->inbuf,buf,188);
     check_cc("rb_read1",sv->id, &sv->my_cc[0], buf);
@@ -213,7 +213,7 @@ int init_service(struct service_t* sv)
   if (sv->ait_pid) {
     create_ait(sv);
   }
-  return 0;  
+  return 0;
 }
 
 void read_to_next_pcr(struct mux_t* mux, struct service_t* sv)
@@ -295,7 +295,7 @@ void sync_to_pcr(struct service_t* sv)
         sv->start_pcr *= 300;
         sv->start_pcr += ((buf[10] & 0x01) << 8) | buf[11];
         sv->second_pcr = sv->start_pcr;
-        fprintf(stderr,"Service %d, pid=%d, start_pcr=%lld (%s)\n",sv->id,pid,sv->start_pcr,pts2hmsu(sv->start_pcr,'.'));
+        fprintf(stderr,"Service %d, pid=%d, start_pcr=%ld (%s)\n",sv->id,pid,sv->start_pcr,pts2hmsu(sv->start_pcr,'.'));
         memcpy(&sv->buf,buf,188);
         sv->packets_in_buf = 1;
         return;
@@ -380,7 +380,7 @@ static void *output_thread(void* userp)
   /* Open Device */
   if ((mod_fd = open(m->device, O_RDWR)) < 0) {
     fprintf(stderr,"Failed to open device.\n");
-    return;
+    return 0;
   }
 
   m->dvbmod_params.cell_id = 0;
@@ -426,7 +426,7 @@ static void *output_thread(void* userp)
         //fprintf(stderr,"Bytes sent: %llu\r",bytes_sent);
       }
     }
-  }  
+  }
 
   close(mod_fd);
   return;
@@ -465,7 +465,7 @@ static void *mux_thread(void* userp)
                              (void *)m);
   if (error) {
     fprintf(stderr, "Couldn't create output thread - errno %d\n", error);
-    return;
+    return 0;
   }
 
   for (i=0;i<m->nservices;i++) {
@@ -490,7 +490,7 @@ static void *mux_thread(void* userp)
     int res = init_service(&m->services[i]);
     if (res < 0) {
       fprintf(stderr,"Error opening service %d (%s), aborting\n",i,m->services[i].url);
-      return;
+      return 0;
     }
 
     dump_service(m->services,i);
@@ -505,7 +505,7 @@ static void *mux_thread(void* userp)
   }
 
 #if 0
-  /* Flush the input buffers */  
+  /* Flush the input buffers */
   for (i=0;i<m->nservices;i++) {
     int to_skip = (rb_get_bytes_used(&m->services[i].inbuf)/188) * 188;
     rb_skip(&m->services[i].inbuf, to_skip);
@@ -591,7 +591,7 @@ static void *mux_thread(void* userp)
     if (next_pmt_bitpos <= next_bitpos) { next_psi = 2; next_bitpos = next_pmt_bitpos; }
     if (next_sdt_bitpos <= next_bitpos) { next_psi = 3; next_bitpos = next_sdt_bitpos; }
     if (next_nit_bitpos <= next_bitpos) { next_psi = 4; next_bitpos = next_nit_bitpos; }
-    if ((m->services[0].ait_pid) && (next_ait_bitpos <= next_bitpos)) { next_psi = 5; next_bitpos = next_ait_bitpos; } 
+    if ((m->services[0].ait_pid) && (next_ait_bitpos <= next_bitpos)) { next_psi = 5; next_bitpos = next_ait_bitpos; }
 
     /* Output NULL packets until we reach next_bitpos */
     while (next_bitpos > output_bitpos) {
@@ -695,7 +695,7 @@ int main(int argc, char* argv[])
 
   fprintf(stderr,"Created mux thread - error=%d\n",error);
   fprintf(stderr,"Waiting for mux thread to terminate...\n");
-  
+
   pthread_join(muxes[0].threadid, NULL);
 
   fprintf(stderr,"Mux thread terminated.\n");
