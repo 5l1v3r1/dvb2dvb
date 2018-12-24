@@ -429,7 +429,7 @@ static void *output_thread(void* userp)
   }
 
   close(mod_fd);
-  return;
+  return 0;
 }
 
 static int ms_to_bits(int channel_capacity, int ms)
