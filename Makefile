@@ -5,7 +5,7 @@ OBJS = dvb2dvb.o psi_read.o psi_create.o crc32.o json.o parse_config.o ringbuffe
 all: dvb2dvb
 
 dvb2dvb: $(OBJS)
-	$(CC) $(CFLAGS) $(LIBS) -o dvb2dvb $(OBJS)
+	$(CC) $(CFLAGS) -o dvb2dvb $(OBJS) $(LIBS)
 
 dvb2dvb.o: dvb2dvb.c dvb2dvb.h psi_read.h psi_create.h crc32.h ringbuffer.h
 	$(CC) $(CFLAGS) -c -o dvb2dvb.o dvb2dvb.c
